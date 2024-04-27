@@ -27,12 +27,13 @@ public class Reservas implements IReservas {
     private static final String COLECCION = "reservas";
 
     public  Reservas() {
+
         comenzar();
     }
 
     public void comenzar() {
         this.coleccionReservas = getBD().getCollection(COLECCION);
-        this.coleccionReservas.drop();
+        //this.coleccionReservas.drop();
     }
 
     public void terminar() {cerrarConexion();}
@@ -98,7 +99,7 @@ public class Reservas implements IReservas {
 
     @Override
     public List<Reserva> getReservas(Huesped huesped) {
-        Objects.requireNonNull(huesped, "ERROR: No se pueden buscar reservas de un huésped nulo.");
+        Objects.requireNonNull(huesped, "ERROR: No se pueden buscar reservas de un huï¿½sped nulo.");
         List<Reserva> reservasHuesped = new ArrayList<>();
         for (Iterator<Reserva> it = get().iterator(); it.hasNext();) {
             Reserva reserva = it.next();
@@ -111,7 +112,7 @@ public class Reservas implements IReservas {
 
     @Override
     public List<Reserva> getReservas(TipoHabitacion tipoHabitacion) {
-        Objects.requireNonNull(tipoHabitacion, "ERROR: No se pueden buscar reservas de un tipo de habitación nula.");
+        Objects.requireNonNull(tipoHabitacion, "ERROR: No se pueden buscar reservas de un tipo de habitaciï¿½n nula.");
         List<Reserva> reservasHabitacion = new ArrayList<>();
         for (Iterator<Reserva> it = get().iterator(); it.hasNext();) {
             Reserva reserva = it.next();
@@ -124,7 +125,7 @@ public class Reservas implements IReservas {
 
     @Override
     public List<Reserva> getReservas(Habitacion habitacion) {
-        Objects.requireNonNull(habitacion, "ERROR: No se pueden buscar reservas de una habitación nula.");
+        Objects.requireNonNull(habitacion, "ERROR: No se pueden buscar reservas de una habitaciï¿½n nula.");
         List<Reserva> reservasHabitacion = new ArrayList<>();
         for (Iterator<Reserva> it = get().iterator(); it.hasNext();) {
             Reserva reserva = it.next();
@@ -137,7 +138,7 @@ public class Reservas implements IReservas {
 
     @Override
     public List<Reserva> getReservasFuturas(Habitacion habitacion) {
-        Objects.requireNonNull(habitacion, "ERROR: No se pueden buscar reservas de una habitación nula.");
+        Objects.requireNonNull(habitacion, "ERROR: No se pueden buscar reservas de una habitaciï¿½n nula.");
         List<Reserva> reservasHabitacion = new ArrayList<>();
         for (Iterator<Reserva> it = get().iterator(); it.hasNext();) {
             Reserva reserva = it.next();

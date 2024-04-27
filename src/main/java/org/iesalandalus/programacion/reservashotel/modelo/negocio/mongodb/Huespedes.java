@@ -3,7 +3,6 @@ package org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.iesalandalus.programacion.reservashotel.modelo.dominio.*;
 import org.iesalandalus.programacion.reservashotel.modelo.negocio.*;
 
@@ -31,7 +30,7 @@ public class Huespedes implements IHuespedes {
     public void comenzar() {
         //MongoCollection<Document> coleccion = getBD().getCollection(COLECCION);
         this.coleccionHuespedes = getBD().getCollection(COLECCION);
-        this.coleccionHuespedes.drop();
+        //this.coleccionHuespedes.drop();
     }
 
     public void terminar() {

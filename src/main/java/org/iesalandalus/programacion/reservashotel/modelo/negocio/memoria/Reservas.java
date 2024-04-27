@@ -4,6 +4,7 @@ import org.iesalandalus.programacion.reservashotel.modelo.dominio.*;
 import org.iesalandalus.programacion.reservashotel.modelo.negocio.IReservas;
 
 import javax.naming.OperationNotSupportedException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -114,7 +115,8 @@ public class Reservas implements IReservas {
         List<Reserva> reservasHabitacion = new ArrayList<>();
         for (Iterator<Reserva> it = get().iterator(); it.hasNext();) {
             Reserva reserva = it.next();
-            if (reserva != null && reserva.getHabitacion().equals(habitacion)) {
+            if (reserva != null && reserva.getHabitacion().equals(habitacion) &&
+                    reserva.getFechaInicioReserva().isAfter(LocalDate.now())) {
                 reservasHabitacion.add(new Reserva(reserva));
             }
         }

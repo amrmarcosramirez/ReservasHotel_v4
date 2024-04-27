@@ -30,9 +30,7 @@ public class Habitaciones implements IHabitaciones {
     }
 
     public void comenzar() {
-        //MongoCollection<Document> coleccion = getBD().getCollection(COLECCION);
         this.coleccionHabitaciones = getBD().getCollection(COLECCION);
-        this.coleccionHabitaciones.drop();
     }
 
     public void terminar() {
@@ -43,27 +41,11 @@ public class Habitaciones implements IHabitaciones {
     @Override
     public List<Habitacion> get() {
         List<Habitacion> copiaHabitaciones = new ArrayList<>();
-
         Document ordenacion = new Document(IDENTIFICADOR,1); // 1 A-Z, 0 Z-A
-        //FindIterable<Document> listado = coleccionHabitaciones.find().sort(ordenacion);
-        //MongoCursor<Document> cursor = coleccionHabitaciones.find().sort(ordenacion).iterator();
-
-        //for (Iterator<Habitacion> it = coleccionHabitaciones.iterator(); it.hasNext(); ) {
         for (MongoCursor<Document> cursor = coleccionHabitaciones.find().sort(ordenacion).iterator();
              cursor.hasNext();) {
             Document documentoHabitacion = cursor.next();
             copiaHabitaciones.add(getHabitacion(documentoHabitacion));
-
-            /*Habitacion habitacion = getHabitacion(documentoHabitacion);
-            if(habitacion instanceof Simple){
-                copiaHabitaciones.add(new Simple((Simple) habitacion));
-            }else if(habitacion instanceof Doble){
-                copiaHabitaciones.add(new Doble((Doble) habitacion));
-            }else if(habitacion instanceof Triple){
-                copiaHabitaciones.add(new Triple((Triple) habitacion));
-            }else {
-                copiaHabitaciones.add(new Suite((Suite) habitacion));
-            }*/
         }
         return copiaHabitaciones;
     }
@@ -73,16 +55,14 @@ public class Habitaciones implements IHabitaciones {
         List<Habitacion> copiaHabitaciones = new ArrayList<>();
         for (Iterator<Habitacion> it = get().iterator();it.hasNext();){
             Habitacion habitacion = it.next();
-            if(habitacion.getClass().isInstance(tipoHabitacion)) {
-                if(habitacion instanceof Simple){
-                    copiaHabitaciones.add(new Simple((Simple) habitacion));
-                }else if(habitacion instanceof Doble){
-                    copiaHabitaciones.add(new Doble((Doble) habitacion));
-                }else if(habitacion instanceof Triple){
-                    copiaHabitaciones.add(new Triple((Triple) habitacion));
-                }else {
-                    copiaHabitaciones.add(new Suite((Suite) habitacion));
-                }
+            if(habitacion instanceof Simple && tipoHabitacion.equals(TipoHabitacion.SIMPLE)){
+                copiaHabitaciones.add(new Simple((Simple) habitacion));
+            }else if(habitacion instanceof Doble && tipoHabitacion.equals(TipoHabitacion.DOBLE)){
+                copiaHabitaciones.add(new Doble((Doble) habitacion));
+            }else if(habitacion instanceof Triple  && tipoHabitacion.equals(TipoHabitacion.TRIPLE)){
+                copiaHabitaciones.add(new Triple((Triple) habitacion));
+            }else if(habitacion instanceof Suite  && tipoHabitacion.equals(TipoHabitacion.SUITE)){
+                copiaHabitaciones.add(new Suite((Suite) habitacion));
             }
         }
         return copiaHabitaciones;

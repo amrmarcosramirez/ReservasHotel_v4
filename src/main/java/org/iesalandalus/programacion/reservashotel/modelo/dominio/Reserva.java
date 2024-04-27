@@ -49,8 +49,8 @@ public class Reserva {
         setFechaInicioReserva(reserva.getFechaInicioReserva());
         setFechaFinReserva(reserva.getFechaFinReserva());
         setNumeroPersonas(reserva.getNumeroPersonas());
-        setCheckIn(reserva.getCheckIn());
-        setCheckOut(reserva.getCheckOut());
+        //this.checkIn = reserva.getCheckIn();
+        //this.checkOut = reserva.getCheckOut();
         setPrecio();
     }
 

@@ -3,12 +3,12 @@ package org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb.utili
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoException;
-import com.mongodb.ServerApi;
-import com.mongodb.ServerApiVersion;
+import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -23,10 +23,13 @@ public class MongoDB {
     public static final DateTimeFormatter FORMATO_DIA_HORA = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     private static final String SERVIDOR = "cluster0.nkyqs3e.mongodb.net";
+    //private static final String SERVIDOR = "localhost";
     private static final int PUERTO = 27017;
     private static final String BD = "reservashotel";
     private static final String USUARIO = "reservashotel";
     private static final String CONTRASENA = "reservashotel-2024";
+    //static final String USUARIO = "admin";
+    //static final String CONTRASENA = "1234";
 
     public static final String HUESPED = "huesped";
     public static final String NOMBRE = "nombre";
@@ -59,11 +62,12 @@ public class MongoDB {
     public static final String CHECKOUT = "checkout";
     public static final String PRECIO_RESERVA = "precio_reserva";
     public static final String NUMERO_PERSONAS = "numero_personas";
-    private static MongoClient conexion;
+    private static MongoClient conexion = null;
 
     //Constructores
     private MongoDB() {
-        establecerConexion();
+
+        //establecerConexion();
     }
 
     //Métodos de acceso y modificación
@@ -77,8 +81,9 @@ public class MongoDB {
         return database;
     }
 
-    private static void establecerConexion(){
+    private static MongoClient establecerConexion(){
 
+        //tring connectionString = "mongodb://"+SERVIDOR+":"+PUERTO;
         String connectionString = "mongodb+srv://"+USUARIO+":"+CONTRASENA+"@"+SERVIDOR+
                 "/?retryWrites=true&w=majority&appName=Cluster0";
         ServerApi serverApi = ServerApi.builder()
@@ -91,11 +96,27 @@ public class MongoDB {
         try
         {
             conexion = MongoClients.create(settings);
+            System.out.println("Conexión a MongoDB realizada correctamente.");
         }
         catch (MongoException e)
         {
             e.printStackTrace();
         }
+
+
+        /*Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        mongoLogger.setLevel(Level.SEVERE);
+        if (conexion == null) {
+            MongoCredential credenciales = MongoCredential.createScramSha1Credential(USUARIO, BD, CONTRASENA.toCharArray());
+            conexion = MongoClients.create(
+                    MongoClientSettings.builder()
+                            .applyToClusterSettings(builder ->
+                                    builder.hosts(Arrays.asList(new ServerAddress(SERVIDOR, PUERTO))))
+                            .credential(credenciales)
+                            .build());
+            System.out.println("Conexión a MongoDB realizada correctamente.");
+        }*/
+        return conexion;
     }
 
     public static void cerrarConexion() {
@@ -111,18 +132,19 @@ public class MongoDB {
         docHuesped.append(DNI, huesped.getDni());
         docHuesped.append(CORREO, huesped.getCorreo());
         docHuesped.append(TELEFONO, huesped.getTelefono());
-        docHuesped.append(FECHA_NACIMIENTO, huesped.getFechaNacimiento());
+        docHuesped.append(FECHA_NACIMIENTO, huesped.getFechaNacimiento().format(FORMATO_DIA));
 
         return docHuesped;
     }
 
     public static Huesped getHuesped(Document documentoHuesped) {
+
         String nombre = documentoHuesped.getString(NOMBRE);
         String dni = documentoHuesped.getString(DNI);
         String correo = documentoHuesped.getString(CORREO);
         String telefono = documentoHuesped.getString(TELEFONO);
-        LocalDate fechaNacimiento = (LocalDate) documentoHuesped.get(FECHA_NACIMIENTO);
-        fechaNacimiento = LocalDate.parse(fechaNacimiento.format(FORMATO_DIA));
+        LocalDate fechaNacimiento = LocalDate.parse(documentoHuesped.getString(FECHA_NACIMIENTO),
+                FORMATO_DIA);
         Huesped huesped = new Huesped(nombre, dni, correo, telefono, fechaNacimiento);
         return huesped;
     }
@@ -132,14 +154,15 @@ public class MongoDB {
         dochabitacion.append(PLANTA, habitacion.getPlanta());
         dochabitacion.append(PUERTA, habitacion.getPuerta());
         dochabitacion.append(PRECIO, habitacion.getPrecio());
-        if(habitacion.getClass().isInstance(TIPO_SIMPLE)){
+
+        if(habitacion instanceof Simple){
             dochabitacion.append(HABITACION_TIPO, TIPO_SIMPLE);
-        } else if(habitacion.getClass().isInstance(TIPO_DOBLE)){
+        } else if(habitacion instanceof Doble){
             Doble habitacion1 = new Doble((Doble) habitacion);
             dochabitacion.append(CAMAS_INDIVIDUALES, habitacion1.getNumCamasIndividuales());
             dochabitacion.append(CAMAS_DOBLES, habitacion1.getNumCamasDobles());
             dochabitacion.append(HABITACION_TIPO, TIPO_DOBLE);
-        } else if(habitacion.getClass().isInstance(TIPO_TRIPLE)){
+        } else if(habitacion instanceof Triple){
             Triple habitacion1 = new Triple((Triple) habitacion);
             dochabitacion.append(BANOS, habitacion1.getNumBanos());
             dochabitacion.append(CAMAS_INDIVIDUALES, habitacion1.getNumCamasIndividuales());
@@ -160,13 +183,13 @@ public class MongoDB {
         int puerta = documentoHabitacion.getInteger(PUERTA);
         double precio = documentoHabitacion.getDouble(PRECIO);
 
-        if(documentoHabitacion.toString().equals(TIPO_SIMPLE)){
+        if(documentoHabitacion.getString(HABITACION_TIPO).equals(TIPO_SIMPLE)){
             habitacion = new Simple(planta, puerta, precio);
-        } else if(documentoHabitacion.toString().equals(TIPO_DOBLE)){
+        } else if(documentoHabitacion.getString(HABITACION_TIPO).equals(TIPO_DOBLE)){
             int numCamasIndividuales = documentoHabitacion.getInteger(CAMAS_INDIVIDUALES);
             int numCamasDobles = documentoHabitacion.getInteger(CAMAS_DOBLES);
             habitacion = new Doble(planta, puerta, precio, numCamasIndividuales, numCamasDobles);
-        } else if(documentoHabitacion.toString().equals(TIPO_TRIPLE)){
+        } else if(documentoHabitacion.getString(HABITACION_TIPO).equals(TIPO_TRIPLE)){
             int numBanos = documentoHabitacion.getInteger(BANOS);
             int numCamasIndividuales = documentoHabitacion.getInteger(CAMAS_INDIVIDUALES);
             int numCamasDobles = documentoHabitacion.getInteger(CAMAS_DOBLES);
