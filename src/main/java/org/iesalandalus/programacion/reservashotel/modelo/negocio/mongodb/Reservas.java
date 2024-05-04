@@ -2,7 +2,10 @@ package org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.iesalandalus.programacion.reservashotel.modelo.dominio.*;
 import org.iesalandalus.programacion.reservashotel.modelo.negocio.IReservas;
 import org.iesalandalus.programacion.reservashotel.modelo.negocio.memoria.Habitaciones;
@@ -16,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.set;
 import static org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb.utilidades.MongoDB.*;
 import static org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb.utilidades.MongoDB.getHuesped;
 
@@ -116,7 +121,14 @@ public class Reservas implements IReservas {
         List<Reserva> reservasHabitacion = new ArrayList<>();
         for (Iterator<Reserva> it = get().iterator(); it.hasNext();) {
             Reserva reserva = it.next();
-            if (reserva.getHabitacion().getClass().isInstance(tipoHabitacion)) {
+
+            if (reserva.getHabitacion() instanceof Simple && tipoHabitacion == TipoHabitacion.SIMPLE) {
+                reservasHabitacion.add(new Reserva(reserva));
+            } else if (reserva.getHabitacion() instanceof Doble && tipoHabitacion == TipoHabitacion.DOBLE) {
+                reservasHabitacion.add(new Reserva(reserva));
+            } else if (reserva.getHabitacion() instanceof Triple && tipoHabitacion == TipoHabitacion.TRIPLE) {
+                reservasHabitacion.add(new Reserva(reserva));
+            } else if (reserva.getHabitacion() instanceof Suite && tipoHabitacion == TipoHabitacion.SUITE) {
                 reservasHabitacion.add(new Reserva(reserva));
             }
         }
@@ -145,6 +157,7 @@ public class Reservas implements IReservas {
             if (reserva != null && reserva.getHabitacion().equals(habitacion) &&
             reserva.getFechaInicioReserva().isAfter(LocalDate.now())) {
                 reservasHabitacion.add(new Reserva(reserva));
+                //System.out.println("NADA");
             }
         }
         return reservasHabitacion;
@@ -153,11 +166,27 @@ public class Reservas implements IReservas {
     @Override
     public void realizarCheckin(Reserva reserva, LocalDateTime fecha){
         reserva.setCheckIn(fecha);
+        Bson campo = set(CHECKIN, reserva.getCheckIn().format(FORMATO_DIA_HORA));
+        Bson c2 = and(eq(HUESPED_DNI, reserva.getHuesped().getDni()),
+                eq(HABITACION_IDENTIFICADOR,reserva.getHabitacion().getIdentificador()));
+        /*coleccionReservas.updateOne(c2, Updates.set(RESERVA+"."+CHECKIN,
+                reserva.getCheckIn().format(FORMATO_DIA_HORA)));*/
+
+        coleccionReservas.updateOne(c2, campo);
     }
 
     @Override
     public void realizarCheckOut(Reserva reserva, LocalDateTime fecha){
+        //System.out.println(reserva.getCheckOut().format(FORMATO_DIA_HORA));
+        //System.out.println(fecha.format(FORMATO_DIA_HORA));
+        //System.out.println(reserva.getCheckIn());
         reserva.setCheckOut(fecha);
+        //System.out.println(reserva.getCheckOut().format(FORMATO_DIA_HORA));
+        Bson campo = set(CHECKOUT, reserva.getCheckOut().format(FORMATO_DIA_HORA));
+        Bson c2 = and(eq(HUESPED_DNI, reserva.getHuesped().getDni()),
+                eq(HABITACION_IDENTIFICADOR,reserva.getHabitacion().getIdentificador()));
+
+        coleccionReservas.updateOne(c2, campo);
     }
 
 }

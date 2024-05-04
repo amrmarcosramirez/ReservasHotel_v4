@@ -258,6 +258,7 @@ public class Vista {
                     numeroPersonas = Entrada.entero();
                     reserva = new Reserva(huesped, habitacionDisponible, regimen, fechaInicio,
                                           fechaFin, numeroPersonas);
+
                     reserva = new Reserva(reserva);
                     reserva.setHabitacion(habitacionDisponible);
 
@@ -350,6 +351,7 @@ public class Vista {
                 TipoHabitacion tipoHabitacion = leerTipoHabitacion();
                 LocalDate fechaInicio = leerFecha("Introduce la fecha de inicio (%s): ");
                 LocalDate fechaFin = leerFecha("Introduce la fecha de fin (%s): ");
+
                 Habitacion habitacionDisponible = consultarDisponibilidad(tipoHabitacion, fechaInicio,
                         fechaFin);
                 if (habitacionDisponible == null) {
@@ -392,6 +394,7 @@ public class Vista {
             for (Iterator<Reserva> it = reservasAAnular.iterator();
                  it.hasNext();) {
                 Reserva reserva = it.next();
+
                 if(reserva.getFechaInicioReserva().isAfter(LocalDate.now())){
                     reservasAnulables.add(new Reserva(reserva));
                 }
@@ -420,9 +423,10 @@ public class Vista {
                 if (huesped1 != null) {
                     List<Reserva> reservas = controlador.getReservas(huesped1);
                     if (!reservas.isEmpty()) {
-                        reservas = getReservasAnulables(reservas);
+                        List<Reserva> reservas1 = getReservasAnulables(reservas);
+
                         int i = 0;
-                        for (Reserva reserva2 : reservas) {
+                        for (Reserva reserva2 : reservas1) {
                             System.out.println(i + ".- " + reserva2);
                             i++;
                         }
@@ -495,13 +499,14 @@ public class Vista {
             List<Habitacion> habitacionesTipoSolicitado = controlador.getHabitaciones(tipoHabitacion);
 
             if (habitacionesTipoSolicitado.isEmpty()) {
-                System.out.println("NADA");
                 return null;
             } else {
                 //for (Iterator<Habitacion> iterator = habitacionesTipoSolicitado.iterator();
                 //iterator.hasNext();) {
                 for (Habitacion habitacion : habitacionesTipoSolicitado) {
+                    //System.out.println(habitacion);
                     List<Reserva> reservasFuturas = controlador.getReservaFuturas(habitacion);
+
                     //int numElementosNoNulos = getNumElementosNoNulos(reservasFuturas);
                     if (reservasFuturas.isEmpty()) {
                         return habitacion;
@@ -608,7 +613,7 @@ public class Vista {
                         int numReserva = Entrada.entero();
                         Reserva reserva = reservas.get(numReserva);
                         //listarReservas(reserva.getHabitacion().getTipoHabitacion());
-                        String mensaje1 = "Introduce la fecha y hora de checkin de la reserva (%s): ";
+                        String mensaje1 = "Introduce la fecha y hora de checkout de la reserva (%s): ";
                         LocalDateTime fechaHora = leerFechaHora(mensaje1);
                         controlador.realizarCheckout(reserva, fechaHora);
                         System.out.println("Checkout realizado correctamente.");

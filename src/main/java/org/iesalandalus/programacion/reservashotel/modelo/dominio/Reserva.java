@@ -35,8 +35,8 @@ public class Reserva {
         setFechaInicioReserva(fechaInicioReserva);
         setFechaFinReserva(fechaFinReserva);
         setNumeroPersonas(numeroPersonas);
-        this.checkIn = null;
-        this.checkOut = null;
+        //this.checkIn = null;
+        //this.checkOut = null;
         setPrecio();
     }
 
@@ -49,8 +49,12 @@ public class Reserva {
         setFechaInicioReserva(reserva.getFechaInicioReserva());
         setFechaFinReserva(reserva.getFechaFinReserva());
         setNumeroPersonas(reserva.getNumeroPersonas());
-        //this.checkIn = reserva.getCheckIn();
-        //this.checkOut = reserva.getCheckOut();
+        this.checkIn = reserva.getCheckIn();
+        this.checkOut = reserva.getCheckOut();
+        //setCheckIn(reserva.getCheckIn());
+        //setCheckOut(reserva.getCheckOut());
+        //this.checkIn = null;
+        //this.checkOut = null;
         setPrecio();
     }
 
@@ -139,8 +143,7 @@ public class Reserva {
     }
 
     public void setCheckIn(LocalDateTime checkIn) {
-        Objects.requireNonNull(checkIn,
-                "ERROR: El checkin de una reserva no puede ser nulo.");
+        //Objects.requireNonNull(checkIn,"ERROR: El checkin de una reserva no puede ser nulo.");
         if (checkIn.toLocalDate().isBefore(getFechaInicioReserva())){
             throw new IllegalArgumentException(
                     "ERROR: El checkin de una reserva no puede ser anterior a la fecha de inicio de la reserva.");
@@ -154,8 +157,7 @@ public class Reserva {
     }
 
     public void setCheckOut(LocalDateTime checkOut) {
-        Objects.requireNonNull(checkOut,
-                "ERROR: El checkout de una reserva no puede ser nulo.");
+        //Objects.requireNonNull(checkOut,"ERROR: El checkout de una reserva no puede ser nulo.");
         if (checkOut.isBefore(getCheckIn())){
             throw new IllegalArgumentException(
                     "ERROR: El checkout de una reserva no puede ser anterior al checkin.");
