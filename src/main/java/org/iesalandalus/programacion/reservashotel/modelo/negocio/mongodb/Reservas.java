@@ -185,7 +185,6 @@ public class Reservas implements IReservas {
         Bson campo = set(CHECKOUT, reserva.getCheckOut().format(FORMATO_DIA_HORA));
         Bson c2 = and(eq(HUESPED_DNI, reserva.getHuesped().getDni()),
                 eq(HABITACION_IDENTIFICADOR,reserva.getHabitacion().getIdentificador()));
-
         coleccionReservas.updateOne(c2, campo);
     }
 
