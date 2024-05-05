@@ -1,7 +1,11 @@
 package org.iesalandalus.programacion.reservashotel.vista;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.iesalandalus.programacion.reservashotel.controlador.Controlador;
 import org.iesalandalus.programacion.reservashotel.modelo.dominio.*;
+import org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb.Huespedes;
 import org.iesalandalus.programacion.utilidades.Entrada;
 
 import javax.naming.OperationNotSupportedException;
@@ -9,7 +13,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 import static org.iesalandalus.programacion.reservashotel.modelo.dominio.TipoHabitacion.*;
+import static org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb.utilidades.MongoDB.*;
+import static org.iesalandalus.programacion.reservashotel.modelo.negocio.mongodb.utilidades.MongoDB.FORMATO_DIA_HORA;
 import static org.iesalandalus.programacion.reservashotel.vista.Consola.*;
 
 public class Vista {
@@ -263,7 +272,29 @@ public class Vista {
                     reserva.setHabitacion(habitacionDisponible);
 
                     controlador.insertar(reserva);
-                    controlador.insertar(reserva.getHuesped());
+
+                    if(controlador.buscar(reserva.getHuesped()) == null) {
+                        controlador.insertar(reserva.getHuesped());
+                    } else {
+                        System.out.println("El huésped de la reserva está dado de alta e el sistema.\n");
+                        System.out.println("Información del sistema:\n");
+                        System.out.println(controlador.buscar(reserva.getHuesped()).toString());
+                        /*System.out.println("\nInformación del la reserva:\n");
+                        System.out.println(reserva.getHuesped().toString());
+                        System.out.println("\nDesea actualizar los datos del huésped en el sistema (S/N)?\n");
+                        char confCambio = Entrada.caracter();
+                        if (confCambio == 'S') {
+                            MongoCollection<Document> huespedes = (MongoCollection<Document>) new Huespedes();
+                            Bson c2 = eq(HUESPED_DNI, reserva.getHuesped().getDni());
+                            Bson campo = set(CORREO, reserva.getHuesped().getCorreo());
+                            Bson campo2 = set(TELEFONO, reserva.getHuesped().getTelefono());
+                            huespedes.updateOne(c2, campo);
+                            huespedes.updateOne(c2, campo2);
+                            //controlador.insertar(reserva.getHuesped());
+                            System.out.println("Información actualizada correctamente.");
+                        }*/
+                    }
+                    //controlador.insertar(reserva.getHuesped());
                     System.out.println("Reserva insertada correctamente.");
                 }
             }
